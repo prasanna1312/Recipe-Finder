@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Finder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header">
+        <img src="Images/logo 2.jpg" alt="webiste logo" id="logo">
+        <h1>SoSaute</h1>
+    </div>
+    <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Search recipes">
+        <button class="btn" id="search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+        <button class="btn" id="favourite"><i class="fa-solid fa-bookmark"></i></button>
+        <button class="btn" id="random-recipe"><i class="fa-solid fa-dice"></i></button>
+        <div id="filter-container">
+        <button class="btn" id="categories"><i class="fa-solid fa-layer-group"></i></button>
+        <div id="filter"></div>
+        </div>
+    </div>
+    
+    <div id="loading"></div>
+
+    <div id ="recipe-card">
+        <img id="recipe-image" src="">
+        <h3></h3>
+    </div>
+    <div id="recipe-details">
+        <h3 id="recipe-title"></h3>
+        <img id="recipe-image1" src="">
+        <p id="recipe-ingredients"></p>
+        <p id="recipe-instructions"></p>
+
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
