@@ -1,8 +1,6 @@
 const search = document.getElementById("search-input");
 const recipe = document.getElementById("recipe-card");
-const recipeImage = document.getElementById("recipe-image");
 const searchBtn = document.getElementById("search-btn");
-const title= document.querySelector("h3");
 const recipeDetails = document.getElementById("recipe-details");
 const recipeImage1 = document.getElementById("recipe-image1");
 const ingredients = document.getElementById("recipe-ingredients");
@@ -17,6 +15,7 @@ const addFavourite = document.getElementById("add-favourite");
 const favouritesContainer = document.getElementById("favourites-container");
 const backBtn = document.getElementById("back-btn");
 
+let selectedMeal;
 let meal;
 let recipeName;
 let response;
@@ -46,7 +45,8 @@ async function APIDetails()
     {
         throw new Error("No recipes found");
     }
-    meal = result.meals[0];
+    meal = result.meals;
+
     }
 
     catch(error){
@@ -59,9 +59,20 @@ async function APIDetails()
 }
 
 function showRecipeCard() {
-    recipeImage.src = meal.strMealThumb;
-    title.textContent = meal.strMeal;
-
+    recipe.innerHTML="";
+    for(let i=0;i<meal.length;i++){
+        const card = document.createElement("div");
+        card.classList.add("recipe-item");
+        card.innerHTML =`
+        <img src= "${meal[i].strMealThumb}">
+        <h3>${meal[i].strMeal}</h3>`;
+        
+    card.addEventListener("click", function() {
+            cookingDetails(meal[i]);
+        });
+        recipe.append(card);
+    }
+   
     recipe.style.display = "flex";
     recipeDetails.style.display = "none";
 }
@@ -74,25 +85,39 @@ searchBtn.addEventListener("click", searchRecipe);
      if(!meal){
         return;
      }
+
     showRecipeCard();
+
+
 
 }
 
-recipe.addEventListener("click", cookingDetails);
-function cookingDetails(){
+function cookingDetails(selectedRecipe){
+        selectedMeal = selectedRecipe;
+
+            const alreadyFavourite = favourites.some(function(item) {
+        return item.idMeal === selectedMeal.idMeal;
+    });
+
+    if (alreadyFavourite) {
+        addFavourite.classList.add("active");
+    } else {
+        addFavourite.classList.remove("active");
+        }
+
      ingredients.textContent="Ingredients: ";
     for(let i=1;i<=20;i++){
-        const ingredient= meal[`strIngredient${i}`];
-        const measure = meal[`strMeasure${i}`];
+        const ingredient= selectedMeal[`strIngredient${i}`];
+        const measure = selectedMeal[`strMeasure${i}`];
 
         if(ingredient){
             ingredients.textContent+= measure+" "+ingredient+ ", ";
         }
     }
 
-    recipeTitle.textContent= `${meal.strMeal}`;
-    recipeImage1.src=`${meal.strMealThumb}`;
-    instructions.textContent = "Instructions: "+meal.strInstructions;
+    recipeTitle.textContent= selectedMeal.strMeal;
+    recipeImage1.src=selectedMeal.strMealThumb;
+    instructions.textContent = "Instructions: "+selectedMeal.strInstructions;
     recipe.style.display="none";
     recipeDetails.style.display="flex";
 
@@ -101,7 +126,7 @@ function cookingDetails(){
 backBtn.addEventListener("click", function() {
 
     recipeDetails.style.display = "none";
-    recipe.style.display = "none";
+    recipe.style.display = "flex";
 
     favouritesContainer.style.display = "none";
 
@@ -141,20 +166,33 @@ async function categories(){
     filters.style.display = "block";
 }
 
+function showRandomRecipe() {
+
+    recipe.innerHTML = "";
+
+    const card = document.createElement("div");
+
+    card.classList.add("recipe-item");
+
+    card.innerHTML = `
+        <img src="${meal.strMealThumb}">
+        <h3>${meal.strMeal}</h3>
+    `;
+
+    card.addEventListener("click", function() {
+        cookingDetails(meal);
+    });
+
+    recipe.append(card);
+
+    recipe.style.display = "flex";
+    recipeDetails.style.display = "none";
+}
+
 random.addEventListener("click", randomRecipe);
 async function randomRecipe() {
     favouritesContainer.style.display = "none";
     loading.textContent = "Loading...";
-    if(recipe.style.display==="flex" || recipeDetails.style.display==="flex")
-    {
-        recipe.style.display="none";
-        recipeDetails.style.display="none";
-            loading.textContent = "";
-
-        return;
-    }
-    loading.textContent = "Loading...";
-
     try{
     const surprise= await fetch("https://www.themealdb.com/api/json/v1/1/random.php");
     if(!surprise.ok){
@@ -164,7 +202,7 @@ async function randomRecipe() {
 
         meal = result.meals[0];
 
-        showRecipeCard();
+        showRandomRecipe();
 
     } catch(error) {
         alert(error.message);
@@ -174,32 +212,32 @@ async function randomRecipe() {
         loading.textContent = "";
     }
 }
-
 function addToFavourites() {
-
-    if (!meal) {
-        alert("Please select a recipe first");
+    if (!selectedMeal) {
         return;
     }
 
-    const alreadyExists = favourites.some(function(item) {
-        return item.idMeal === meal.idMeal;
+    const index = favourites.findIndex(function(item) {
+        return item.idMeal === selectedMeal.idMeal;
     });
 
-    if (alreadyExists) {
-        alert("Recipe is already in favourites");
-        return;
+    if (index !== -1) {
+        // Remove from favourites
+        favourites.splice(index, 1);
+        addFavourite.classList.remove("active");
+    } else {
+        // Add to favourites
+        favourites.push(selectedMeal);
+        addFavourite.classList.add("active");
     }
-
-    favourites.push(meal);
 
     localStorage.setItem(
         "favourites",
         JSON.stringify(favourites)
     );
-
-    alert("Recipe added to favourites");
 }
+
+addFavourite.addEventListener("click", addToFavourites);
 addFavourite.addEventListener("click", addToFavourites);
 
 function showFavourites() {
